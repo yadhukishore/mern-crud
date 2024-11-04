@@ -1,8 +1,9 @@
 import express from 'express';
-import { test } from '../controllers/instance.controller.js';
+import { createInstance, getInstances } from '../controllers/instance.controller.js';
 
 const router = express.Router();
 
-router.get('/test',test)
+router.post("/instances", createInstance);
+router.get("/instances", getInstances); 
 
 export default router;

@@ -4,6 +4,7 @@ import Detail from './pages/Detail';
 import Header from './components/Header';
 import Layout from './components/Layout';
 import IconSidebar from './components/IconSidebar';
+import CreateInstance from './pages/CreateInstance';
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
               <Route element={<Layout />}>
                 <Route path="/" element={<Home />} />
                 <Route path="/detail" element={<Detail />} />
+                <Route path="/createInstance" element={<CreateInstance />} />
               </Route>
             </Routes>
           </div>
