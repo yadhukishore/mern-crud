@@ -43,12 +43,12 @@ const Layout = () => {
           </nav>
 
           <h2 className="text-xs font-semibold text-gray-500 mt-6 mb-4">CHECKIN INSTANCE</h2>
-          <nav className="space-y-1">
-            <button className="flex items-center w-full px-3 py-2 text-sm text-gray-700 group hover:bg-gray-100 rounded-md">
-              <TicketMinus className="w-4 h-4 mr-3" />
-              <span className="group-hover:font-bold group-hover:text-black">Instance</span>
-            </button>
-          </nav>
+            <nav className="space-y-1">
+        <button className="flex items-center w-full px-3 py-2 text-sm text-gray-700 bg-gray-100 rounded-md">
+                <TicketMinus className="w-4 h-4 mr-3 text-blue-500" />
+            <span className="font-bold text-black">Instance</span>
+        </button>
+            </nav>
         </div>
       </aside>
 
