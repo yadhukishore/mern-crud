@@ -1,4 +1,4 @@
-import { LayoutGrid, Cog, RotateCcw, Printer, Instagram, BarChart2, Inbox } from 'lucide-react';
+import { LayoutGrid, Cog, Undo2, Printer, Instagram, Inbox, PanelsTopLeft, ChartPie } from 'lucide-react';
 
 const IconSidebar = () => {
   return (
@@ -11,28 +11,38 @@ const IconSidebar = () => {
         />
       </div>
       
-      <button className="p-2 rounded-lg hover:bg-gray-100">
+      <button className="flex flex-col items-center space-y-1 p-2  rounded-lg hover:bg-gray-100 p-1">
         <LayoutGrid className="w-5 h-5 text-gray-600" />
+        <span className="text-xs text-gray-600 text-xs ">Dashboard</span>
       </button>
-      <button className="p-2 rounded-lg hover:bg-gray-100">
+      <button className="flex flex-col items-center space-y-1 p-2 rounded-lg hover:bg-gray-100">
         <Inbox className="w-5 h-5 text-gray-600" />
+        <span className="text-xs text-gray-600">Configure</span>
       </button>
-      <button className="p-2 rounded-lg hover:bg-gray-100">
-        <Printer className="w-5 h-5 text-gray-600" />
+      <button className="flex flex-col items-center space-y-1 p-2 rounded-lg hover:bg-gray-100">
+      <PanelsTopLeft className="w-5 h-5 text-gray-600" />
+        <span className="text-xs text-gray-600">Website</span>
       </button>
-      <button className="p-2 rounded-lg hover:bg-gray-100">
+      <button className="flex flex-col items-center space-y-1 p-2 rounded-lg hover:bg-gray-100">
+      <Printer className="w-5 h-5 text-gray-600" />
+        <span className="text-xs text-gray-600">Printer</span>
+      </button>
+      <button className="flex flex-col items-center space-y-1 p-2 rounded-lg hover:bg-gray-100">
         <Instagram className="w-5 h-5 text-gray-600" />
+        <span className="text-xs text-gray-600">Insta Snap</span>
       </button>
-      <button className="p-2 rounded-lg hover:bg-gray-100">
-        <BarChart2 className="w-5 h-5 text-gray-600" />
+      <button className="flex flex-col items-center space-y-1 p-2 rounded-lg hover:bg-gray-100">
+      <ChartPie className="w-5 h-5 text-gray-600" />
+        <span className="text-xs text-gray-600">Reports</span>
       </button>
-      <button className="p-2 rounded-lg hover:bg-gray-100">
+      <button className="flex flex-col items-center space-y-1 p-2 rounded-lg hover:bg-gray-100">
         <Cog className="w-5 h-5 text-gray-600" />
+        <span className="text-xs text-gray-600">Settings</span>
       </button>
-      
-      <div className="mt-auto">
-        <button className="p-2 rounded-lg hover:bg-gray-100">
-          <RotateCcw className="w-5 h-5 text-gray-600" />
+
+      <div className="mt-auto py-5">
+        <button className="flex flex-col items-center space-y-1 p-2 outline outline-gray-100  rounded-lg hover:bg-gray-100">
+        <Undo2  className="w-5 h-5 text-gray-600" />
         </button>
       </div>
     </aside>
