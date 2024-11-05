@@ -1,6 +1,7 @@
 import { useState } from "react";
 // import { Link } from "react-router-dom";
 import { Pencil, Globe, ChevronDown, Play, Menu } from "lucide-react";
+import CurrentDate from "./CurrentDate";
 
 const Header = () => {
   const [showPublishDropdown, setShowPublishDropdown] = useState(false);
@@ -17,7 +18,7 @@ const Header = () => {
         <div className="flex flex-col">
           <h1 className="text-base sm:text-lg font-medium">Come On Kerala</h1>
           <span className="text-xs sm:text-sm text-gray-500">
-            Jun 25 Sat, 2024 - 8:00 AM (IST)
+          <CurrentDate />
           </span>
         </div>
       </div>

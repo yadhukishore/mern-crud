@@ -180,11 +180,11 @@ const Home = () => {
         </div>
         <div className="flex space-x-2">
             <button className="flex items-center bg-gray-100 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-200">
-                <Upload size={16} className="mr-1" />
+                <Download size={16} className="mr-1" />
                     Import
             </button>
             <button className="flex items-center bg-gray-100 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-200">
-                <Download size={16} className="mr-1" />
+                <Upload size={16} className="mr-1" />
                     Export
             </button>
             <button
@@ -233,9 +233,9 @@ const Home = () => {
                     <td className="px-6 py-4 border-b border-gray-200 text-gray-500">
                       {formatTickets(instance.ticket)}
                     </td>
-                    <td className="px-6 py-4 border-b border-gray-200 text-blue-600 cursor-pointer">{alloted}</td>
-                    <td className="px-6 py-4 border-b border-gray-200 text-blue-600 cursor-pointer">{checkin}</td>
-                    <td className="px-6 py-4 border-b border-gray-200 text-blue-600 cursor-pointer">{pending}</td>
+                    <td className="px-6 py-4 border-b border-gray-200 text-blue-600 cursor-pointer underline">{alloted}</td>
+                    <td className="px-6 py-4 border-b border-gray-200 text-blue-600 cursor-pointer underline">{checkin}</td>
+                    <td className="px-6 py-4 border-b border-gray-200 text-blue-600 cursor-pointer underline">{pending}</td>
                     <td className="px-6 py-4 border-b border-gray-200">
                       <div className="flex items-center justify-center space-x-4">
                         <button className="flex items-center space-x-1 bg-gray-200 px-4 py-1 rounded-md hover:bg-gray-300">
