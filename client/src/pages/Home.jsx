@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { ScanLine, MoreVertical, Edit, Trash2 } from "lucide-react";
+import { ScanLine, MoreVertical, Edit, Trash2, ListFilter } from "lucide-react";
 import apiService from "../services/apiServices";
+import SearchInput from "./SearchInput";
 
 const Home = () => {
   const [instances, setInstances] = useState([]);
+  const [filteredInstances, setFilteredInstances] = useState([]);
   const [openDropdownId, setOpenDropdownId] = useState(null);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const navigate = useNavigate();
@@ -15,6 +17,7 @@ const Home = () => {
       try {
         const response = await apiService.get("/instance/instances");
         setInstances(response.data);
+        setFilteredInstances(response.data);
       } catch (error) {
         console.error("Error fetching instances:", error);
       }
@@ -39,7 +42,6 @@ const Home = () => {
   const formatParticipantTypes = (participantTypes) => {
     if (!participantTypes) return '';
     
-    // Handle if participantTypes is a string (comma-separated)
     const typesArray = Array.isArray(participantTypes) 
       ? participantTypes 
       : participantTypes.split(',').map(type => type.trim());
@@ -127,6 +129,13 @@ const Home = () => {
     return alloted - checkin;
   };
 
+  const handleSearch = (query) => {
+    const filtered = instances.filter((instance) =>
+      instance.instanceName.toLowerCase().includes(query.toLowerCase())
+    );
+    setFilteredInstances(filtered);
+  };
+
   if (instances.length === 0) {
     return (
       <div className="p-6 bg-gray-50 min-h-screen">
@@ -164,7 +173,13 @@ const Home = () => {
     <div className="p-6 bg-gray-50 h-screen">
       <h2 className="text-2xl font-semibold text-gray-800 mb-4">Instance</h2>
       <div className="flex justify-between items-center mb-4">
-        <button className="bg-gray-100 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-200">Filter</button>
+        <div className="flex items-center space-x-2">
+        <SearchInput onSearch={handleSearch} />
+          <button className="flex items-center border border-gray-300 py-1 px-2 rounded-md hover:bg-gray-300">
+            <ListFilter className="mr-2" /> 
+            Filter
+          </button>        
+        </div>
         <div className="flex space-x-2">
           <button className="bg-gray-100 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-200">Import</button>
           <button className="bg-gray-100 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-200">Export</button>
@@ -191,7 +206,7 @@ const Home = () => {
             </tr>
           </thead>
           <tbody>
-            {instances.map((instance) => {
+            {(filteredInstances.length > 0 ? filteredInstances : instances).map((instance) => {
               const alloted = 340;
               const checkin = instance.ticket * 40;
               const pending = calculatePending(alloted, checkin);
@@ -204,7 +219,8 @@ const Home = () => {
                   </td>
                   <td className="px-6 py-4 border-b border-gray-200 text-gray-500">
                     {formatTickets(instance.ticket)}
-                  </td>                  <td className="px-6 py-4 border-b border-gray-200 text-blue-600 cursor-pointer">{alloted}</td>
+                  </td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-blue-600 cursor-pointer">{alloted}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-blue-600 cursor-pointer">{checkin}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-blue-600 cursor-pointer">{pending}</td>
                   <td className="px-6 py-4 border-b border-gray-200">
