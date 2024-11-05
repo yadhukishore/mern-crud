@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { ArrowLeft, Save, Plus, X } from 'lucide-react';
 import Swal from 'sweetalert2';
+import apiService from '../services/apiServices';
 
 const EditInstance = () => {
   const { id } = useParams();
@@ -22,7 +22,7 @@ const EditInstance = () => {
     const fetchInstance = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:3000/api/instance/edit/${id}`);
+        const response = await apiService.get(`/instance/edit/${id}`);
         const instance = response.data;
         setFormData({
           instanceName: instance.instanceName,
@@ -134,7 +134,7 @@ const EditInstance = () => {
     }
 
     try {
-      await axios.put(`http://localhost:3000/api/instance/edit/${id}`, formData);
+      await apiService.put(`/instance/edit/${id}`, formData);
       
       Swal.fire({
         icon: 'success',

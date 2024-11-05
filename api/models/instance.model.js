@@ -12,7 +12,11 @@ const instanceSchema = new mongoose.Schema({
     ticket:{
         type:Number,
         require:true
-    }
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false,
+      },
 },{timestamps:true});
 
 const Instance = mongoose.model('Instance',instanceSchema);

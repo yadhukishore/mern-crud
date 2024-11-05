@@ -1,7 +1,7 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import apiService from "../services/apiServices";
 
 const CreateInstance = () => {
   const navigate = useNavigate();
@@ -63,7 +63,7 @@ const CreateInstance = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:3000/api/instance/instances", {
+      const response = await apiService.post("/instance/instances", {
         instanceName,
         participantType,
         ticket: ticketCount,

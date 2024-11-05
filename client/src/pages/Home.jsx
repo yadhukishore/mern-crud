@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { ScanLine, MoreVertical, Edit, Trash2 } from "lucide-react";
+import apiService from "../services/apiServices";
 
 const Home = () => {
   const [instances, setInstances] = useState([]);
@@ -13,7 +13,7 @@ const Home = () => {
   useEffect(() => {
     const fetchInstances = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/instance/instances");
+        const response = await apiService.get("/instance/instances");
         setInstances(response.data);
       } catch (error) {
         console.error("Error fetching instances:", error);
@@ -98,7 +98,7 @@ const Home = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://localhost:3000/api/instance/${id}`);
+            await apiService.put(`/instance/soft-delete/${id}`);
           setInstances(instances.filter(instance => instance._id !== id));
           Swal.fire('Deleted!', 'Instance has been deleted.', 'success');
         } catch (error) {

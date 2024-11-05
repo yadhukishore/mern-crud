@@ -2,8 +2,8 @@ import Instance from "../models/instance.model.js";
 
 export const getInstances = async (req, res) => {
   try {
-    const instances = await Instance.find();
-    console.log("Instances: ",instances)
+    const instances = await Instance.find({ isDeleted: { $ne: true } });
+    // console.log("Instances: ",instances)
     res.status(200).json(instances);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch instances" });
@@ -46,6 +46,17 @@ export const getInstanceById = async (req, res) => {
       res.status(200).json(updatedInstance);
     } catch (error) {
       res.status(500).json({ error: "Failed to update instance" });
+    }
+  };
+
+  export const softDeleteInstance = async (req, res) => {
+    try {
+        console.log("On Soft delete")
+      const { id } = req.params;
+      await Instance.findByIdAndUpdate(id, { isDeleted: true });
+      res.json({ message: "Instance soft-deleted successfully." });
+    } catch (error) {
+      res.status(500).json({ error: "Error deleting instance." });
     }
   };
   
