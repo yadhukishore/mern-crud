@@ -57,6 +57,7 @@ Create a `.env` file in the root directory and add your environment variables:
 ```env
 MONGO_URI= your_mongodb_connection_string
 PORT=3000
+VITE_BASE_URL = "http://localhost:3000"
 ```
 
 ## Running the Application
