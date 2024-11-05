@@ -1,17 +1,23 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Search } from "lucide-react";
 
 const SearchInput = ({ onSearch }) => {
   const [showInput, setShowInput] = useState(false);
   const [query, setQuery] = useState("");
+  const inputRef = useRef(null); // Create a ref for the input
 
   const handleSearchClick = () => {
     setShowInput((prev) => !prev);
+    if (!showInput) {
+      setTimeout(() => {
+        inputRef.current.focus(); // Set focus on the input when it is shown
+      }, 0);
+    }
   };
 
   const handleInputChange = (e) => {
     setQuery(e.target.value);
-    onSearch(e.target.value); 
+    onSearch(e.target.value);
   };
 
   return (
@@ -25,6 +31,7 @@ const SearchInput = ({ onSearch }) => {
       {showInput && (
         <input
           type="text"
+          ref={inputRef} // Attach the ref to the input
           value={query}
           onChange={handleInputChange}
           placeholder="Search instance..."

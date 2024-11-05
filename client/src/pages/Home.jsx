@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { ScanLine, MoreVertical, Edit, Trash2, ListFilter } from "lucide-react";
+import { ScanLine, MoreVertical, Edit, Trash2, ListFilter, SearchX } from "lucide-react";
 import apiService from "../services/apiServices";
 import SearchInput from "./SearchInput";
 
@@ -10,9 +10,9 @@ const Home = () => {
   const [filteredInstances, setFilteredInstances] = useState([]);
   const [openDropdownId, setOpenDropdownId] = useState(null);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
-  // Separate function to fetch instances
   const fetchInstances = async () => {
     try {
       const response = await apiService.get("/instance/instances");
@@ -103,7 +103,7 @@ const Home = () => {
 
       if (result.isConfirmed) {
         await apiService.put(`/instance/soft-delete/${id}`);
-        await fetchInstances(); // Fetch fresh data after successful deletion
+        await fetchInstances();
         Swal.fire('Deleted!', 'Instance has been deleted.', 'success');
       }
     } catch (error) {
@@ -131,12 +131,14 @@ const Home = () => {
   };
 
   const handleSearch = (query) => {
+    setSearchQuery(query);
     const filtered = instances.filter((instance) =>
       instance.instanceName.toLowerCase().includes(query.toLowerCase())
     );
     setFilteredInstances(filtered);
   };
 
+  // Show empty state when no instances exist
   if (instances.length === 0) {
     return (
       <div className="p-6 bg-gray-50 min-h-screen">
@@ -188,84 +190,94 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto relative">
-        <table className="min-w-full bg-white shadow-md rounded-lg">
-          <thead>
-            <tr className="bg-gray-100 text-gray-500 text-left">
-              <th className="px-6 py-3 border-b border-gray-300">Instance Name</th>
-              <th className="px-6 py-3 border-b border-gray-300">Included Participant Types</th>
-              <th className="px-6 py-3 border-b border-gray-300">Included Tickets</th>
-              <th className="px-6 py-3 border-b border-gray-300">Alloted</th>
-              <th className="px-6 py-3 border-b border-gray-300">Checkin</th>
-              <th className="px-6 py-3 border-b border-gray-300">Pending</th>
-              <th className="px-6 py-3 border-b border-gray-300 text-center"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {(filteredInstances.length > 0 ? filteredInstances : instances).map((instance) => {
-              const alloted = 340;
-              const checkin = instance.ticket * 40;
-              const pending = calculatePending(alloted, checkin);
+      {filteredInstances.length === 0 && searchQuery ? (
+        <div className="flex flex-col items-center justify-center bg-white rounded-lg shadow-md py-12 mt-4">
+          <SearchX size={48} className="text-gray-400 mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No instances found</h3>
+          <p className="text-sm text-gray-500">
+            No instances match your search "{searchQuery}". Try a different search term.
+          </p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto relative">
+          <table className="min-w-full bg-white shadow-md rounded-lg">
+            <thead>
+              <tr className="bg-gray-100 text-gray-500 text-left">
+                <th className="px-6 py-3 border-b border-gray-300">Instance Name</th>
+                <th className="px-6 py-3 border-b border-gray-300">Included Participant Types</th>
+                <th className="px-6 py-3 border-b border-gray-300">Included Tickets</th>
+                <th className="px-6 py-3 border-b border-gray-300">Alloted</th>
+                <th className="px-6 py-3 border-b border-gray-300">Checkin</th>
+                <th className="px-6 py-3 border-b border-gray-300">Pending</th>
+                <th className="px-6 py-3 border-b border-gray-300 text-center"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredInstances.map((instance) => {
+                const alloted = 340;
+                const checkin = instance.ticket * 40;
+                const pending = calculatePending(alloted, checkin);
 
-              return (
-                <tr key={instance._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 border-b border-gray-200">{instance.instanceName}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-gray-500">
-                    {formatParticipantTypes(instance.participantType)}
-                  </td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-gray-500">
-                    {formatTickets(instance.ticket)}
-                  </td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-blue-600 cursor-pointer">{alloted}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-blue-600 cursor-pointer">{checkin}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-blue-600 cursor-pointer">{pending}</td>
-                  <td className="px-6 py-4 border-b border-gray-200">
-                    <div className="flex items-center justify-center space-x-4">
-                      <button className="flex items-center space-x-1 bg-gray-200 px-4 py-1 rounded-md hover:bg-gray-300">
-                        <ScanLine size={16} />
-                        <span>Scan</span>
-                      </button>
-                      <div className="relative dropdown-container">
-                        <button
-                          onClick={(e) => toggleDropdown(instance._id, e)}
-                          className="text-gray-600 hover:text-gray-800 focus:outline-none"
-                        >
-                          <MoreVertical size={20} />
+                return (
+                  <tr key={instance._id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 border-b border-gray-200">{instance.instanceName}</td>
+                    <td className="px-6 py-4 border-b border-gray-200 text-gray-500">
+                      {formatParticipantTypes(instance.participantType)}
+                    </td>
+                    <td className="px-6 py-4 border-b border-gray-200 text-gray-500">
+                      {formatTickets(instance.ticket)}
+                    </td>
+                    <td className="px-6 py-4 border-b border-gray-200 text-blue-600 cursor-pointer">{alloted}</td>
+                    <td className="px-6 py-4 border-b border-gray-200 text-blue-600 cursor-pointer">{checkin}</td>
+                    <td className="px-6 py-4 border-b border-gray-200 text-blue-600 cursor-pointer">{pending}</td>
+                    <td className="px-6 py-4 border-b border-gray-200">
+                      <div className="flex items-center justify-center space-x-4">
+                        <button className="flex items-center space-x-1 bg-gray-200 px-4 py-1 rounded-md hover:bg-gray-300">
+                          <ScanLine size={16} />
+                          <span>Scan</span>
                         </button>
+                        <div className="relative dropdown-container">
+                          <button
+                            onClick={(e) => toggleDropdown(instance._id, e)}
+                            className="text-gray-600 hover:text-gray-800 focus:outline-none"
+                          >
+                            <MoreVertical size={20} />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-        {openDropdownId && (
-          <div
-            className="fixed bg-white rounded-md shadow-lg z-50 py-1 border border-gray-200"
-            style={{
-              top: `${dropdownPosition.top}px`,
-              left: `${dropdownPosition.left}px`,
-            }}
+      {openDropdownId && (
+        <div
+          className="fixed bg-white rounded-md shadow-lg z-50 py-1 border border-gray-200"
+          style={{
+            top: `${dropdownPosition.top}px`,
+            left: `${dropdownPosition.left}px`,
+          }}
+        >
+          <button
+            onClick={() => handleEdit(openDropdownId)}
+            className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
           >
-            <button
-              onClick={() => handleEdit(openDropdownId)}
-              className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-            >
-              <Edit size={16} />
-              <span>Edit</span>
-            </button>
-            <button
-              onClick={() => handleDelete(openDropdownId)}
-              className="flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
-            >
-              <Trash2 size={16} />
-              <span>Delete</span>
-            </button>
-          </div>
-        )}
-      </div>
+            <Edit size={16} />
+            <span>Edit</span>
+          </button>
+          <button
+            onClick={() => handleDelete(openDropdownId)}
+            className="flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
+          >
+            <Trash2 size={16} />
+            <span>Delete</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 };
