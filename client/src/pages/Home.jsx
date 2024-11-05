@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { ScanLine, MoreVertical, Edit, Trash2, ListFilter, SearchX } from "lucide-react";
+import { ScanLine, MoreVertical, Edit, Trash2, ListFilter, SearchX, Upload, Download } from "lucide-react";
 import apiService from "../services/apiServices";
 import SearchInput from "./SearchInput";
 
@@ -179,12 +179,18 @@ const Home = () => {
           </button>
         </div>
         <div className="flex space-x-2">
-          <button className="bg-gray-100 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-200">Import</button>
-          <button className="bg-gray-100 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-200">Export</button>
-          <button
+            <button className="flex items-center bg-gray-100 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-200">
+                <Upload size={16} className="mr-1" />
+                    Import
+            </button>
+            <button className="flex items-center bg-gray-100 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-200">
+                <Download size={16} className="mr-1" />
+                    Export
+            </button>
+            <button
             onClick={handleAddInstance}
             className="bg-blue-600 px-4 py-2 rounded-md text-white hover:bg-blue-700"
-          >
+             >
             + Add Instance
           </button>
         </div>
