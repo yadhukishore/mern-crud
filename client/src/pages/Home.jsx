@@ -12,17 +12,19 @@ const Home = () => {
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchInstances = async () => {
-      try {
-        const response = await apiService.get("/instance/instances");
-        setInstances(response.data);
-        setFilteredInstances(response.data);
-      } catch (error) {
-        console.error("Error fetching instances:", error);
-      }
-    };
+  // Separate function to fetch instances
+  const fetchInstances = async () => {
+    try {
+      const response = await apiService.get("/instance/instances");
+      setInstances(response.data);
+      setFilteredInstances(response.data);
+    } catch (error) {
+      console.error("Error fetching instances:", error);
+      Swal.fire('Error!', 'Failed to fetch instances.', 'error');
+    }
+  };
 
+  useEffect(() => {
     fetchInstances();
   }, []);
 
@@ -63,7 +65,6 @@ const Home = () => {
     return `Ticket 01, Ticket 02 +${ticketCount - 2} more`;
   };
 
-
   const handleAddInstance = () => {
     Swal.fire({
       title: 'Add New Instance',
@@ -86,29 +87,29 @@ const Home = () => {
     setOpenDropdownId(null);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     setOpenDropdownId(null);
-    Swal.fire({
-      title: 'Delete Instance',
-      text: 'Are you sure you want to delete this instance?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'Cancel'
-    }).then(async (result) => {
+    try {
+      const result = await Swal.fire({
+        title: 'Delete Instance',
+        text: 'Are you sure you want to delete this instance?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+      });
+
       if (result.isConfirmed) {
-        try {
-            await apiService.put(`/instance/soft-delete/${id}`);
-          setInstances(instances.filter(instance => instance._id !== id));
-          Swal.fire('Deleted!', 'Instance has been deleted.', 'success');
-        } catch (error) {
-          console.error("Error deleting instance:", error);
-          Swal.fire('Error!', 'Failed to delete instance.', 'error');
-        }
+        await apiService.put(`/instance/soft-delete/${id}`);
+        await fetchInstances(); // Fetch fresh data after successful deletion
+        Swal.fire('Deleted!', 'Instance has been deleted.', 'success');
       }
-    });
+    } catch (error) {
+      console.error("Error deleting instance:", error);
+      Swal.fire('Error!', 'Failed to delete instance.', 'error');
+    }
   };
 
   const toggleDropdown = (id, e) => {
@@ -142,12 +143,7 @@ const Home = () => {
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Instance</h2>
         <div className="flex flex-col items-center justify-center mt-32">
           <div className="w-24 h-24 mb-6 text-gray-300">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path
                 d="M19 11H5M19 11C20.1046 11 21 21.8954 21 13V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V13C3 11.8954 3.89543 11 5 11M19 11V9C19 7.89543 18.1046 7 17 7M5 11V9C5 7.89543 5.89543 7 7 7M7 7V5C7 3.89543 7.89543 3 9 3H15C16.1046 3 17 3.89543 17 5V7M7 7H17"
                 strokeLinecap="round"
@@ -157,7 +153,7 @@ const Home = () => {
             </svg>
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">No instance added</h3>
-          <p className="text-sm text-gray-500 mb-6">Add a instance to start building your event</p>
+          <p className="text-sm text-gray-500 mb-6">Add an instance to start building your event</p>
           <button
             onClick={handleAddInstance}
             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center space-x-2"
@@ -170,20 +166,20 @@ const Home = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-50 h-screen">
+    <div className="p-6 bg-gray-50 min-h-screen">
       <h2 className="text-2xl font-semibold text-gray-800 mb-4">Instance</h2>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-4 space-y-3 md:space-y-0">
         <div className="flex items-center space-x-2">
-        <SearchInput onSearch={handleSearch} />
+          <SearchInput onSearch={handleSearch} />
           <button className="flex items-center border border-gray-300 py-1 px-2 rounded-md hover:bg-gray-300">
-            <ListFilter className="mr-2" /> 
+            <ListFilter className="mr-2" />
             Filter
-          </button>        
+          </button>
         </div>
         <div className="flex space-x-2">
           <button className="bg-gray-100 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-200">Import</button>
           <button className="bg-gray-100 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-200">Export</button>
-          <button 
+          <button
             onClick={handleAddInstance}
             className="bg-blue-600 px-4 py-2 rounded-md text-white hover:bg-blue-700"
           >
@@ -230,7 +226,7 @@ const Home = () => {
                         <span>Scan</span>
                       </button>
                       <div className="relative dropdown-container">
-                        <button 
+                        <button
                           onClick={(e) => toggleDropdown(instance._id, e)}
                           className="text-gray-600 hover:text-gray-800 focus:outline-none"
                         >
@@ -244,12 +240,12 @@ const Home = () => {
             })}
           </tbody>
         </table>
-        
+
         {openDropdownId && (
-          <div 
+          <div
             className="fixed bg-white rounded-md shadow-lg z-50 py-1 border border-gray-200"
-            style={{ 
-              top: `${dropdownPosition.top}px`, 
+            style={{
+              top: `${dropdownPosition.top}px`,
               left: `${dropdownPosition.left}px`,
             }}
           >
