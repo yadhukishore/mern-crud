@@ -2,17 +2,18 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { ScanLine, MoreVertical } from "lucide-react";
+import { ScanLine, MoreVertical, Edit, Trash2 } from "lucide-react";
 
 const Home = () => {
   const [instances, setInstances] = useState([]);
+  const [openDropdownId, setOpenDropdownId] = useState(null);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchInstances = async () => {
       try {
         const response = await axios.get("http://localhost:3000/api/instance/instances");
-        console.log("Response:", response);
         setInstances(response.data);
       } catch (error) {
         console.error("Error fetching instances:", error);
@@ -20,6 +21,19 @@ const Home = () => {
     };
 
     fetchInstances();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.dropdown-container')) {
+        setOpenDropdownId(null);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
   }, []);
 
   const handleAddInstance = () => {
@@ -37,6 +51,50 @@ const Home = () => {
         navigate('/createInstance');
       }
     });
+  };
+
+  const handleEdit = (id) => {
+    navigate(`/edit/${id}`);
+    setOpenDropdownId(null);
+  };
+
+  const handleDelete = (id) => {
+    setOpenDropdownId(null);
+    Swal.fire({
+      title: 'Delete Instance',
+      text: 'Are you sure you want to delete this instance?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axios.delete(`http://localhost:3000/api/instance/${id}`);
+          setInstances(instances.filter(instance => instance._id !== id));
+          Swal.fire('Deleted!', 'Instance has been deleted.', 'success');
+        } catch (error) {
+          console.error("Error deleting instance:", error);
+          Swal.fire('Error!', 'Failed to delete instance.', 'error');
+        }
+      }
+    });
+  };
+
+  const toggleDropdown = (id, e) => {
+    e.stopPropagation();
+    const button = e.currentTarget;
+    const rect = button.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    
+    setDropdownPosition({
+      top: rect.top + scrollTop - 10, // Position slightly above the button
+      left: rect.left - 120 // Offset to the left
+    });
+    
+    setOpenDropdownId(openDropdownId === id ? null : id);
   };
 
   const calculatePending = (alloted, checkin) => {
@@ -93,10 +151,10 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto relative">
         <table className="min-w-full bg-white shadow-md rounded-lg">
           <thead>
-            <tr className="bg-gray-100 text-left">
+            <tr className="bg-gray-100 text-gray-500 text-left">
               <th className="px-6 py-3 border-b border-gray-300">Instance Name</th>
               <th className="px-6 py-3 border-b border-gray-300">Included Participant Types</th>
               <th className="px-6 py-3 border-b border-gray-300">Included Tickets</th>
@@ -126,9 +184,14 @@ const Home = () => {
                         <ScanLine size={16} />
                         <span>Scan</span>
                       </button>
-                      <button className="text-gray-600 hover:text-gray-800">
-                        <MoreVertical size={20} />
-                      </button>
+                      <div className="relative dropdown-container">
+                        <button 
+                          onClick={(e) => toggleDropdown(instance._id, e)}
+                          className="text-gray-600 hover:text-gray-800 focus:outline-none"
+                        >
+                          <MoreVertical size={20} />
+                        </button>
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -136,6 +199,32 @@ const Home = () => {
             })}
           </tbody>
         </table>
+        
+        {/* Floating dropdown menu */}
+        {openDropdownId && (
+          <div 
+            className="fixed bg-white rounded-md shadow-lg z-50 py-1 border border-gray-200"
+            style={{ 
+              top: `${dropdownPosition.top}px`, 
+              left: `${dropdownPosition.left}px`,
+            }}
+          >
+            <button
+              onClick={() => handleEdit(openDropdownId)}
+              className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+            >
+              <Edit size={16} />
+              <span>Edit</span>
+            </button>
+            <button
+              onClick={() => handleDelete(openDropdownId)}
+              className="flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
+            >
+              <Trash2 size={16} />
+              <span>Delete</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
