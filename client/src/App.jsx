@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Layout from './components/Layout';
 import IconSidebar from './components/IconSidebar';
 import CreateInstance from './pages/CreateInstance';
+import EditInstance from './pages/EditInstance';
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/detail" element={<Detail />} />
                 <Route path="/createInstance" element={<CreateInstance />} />
+                <Route path="/edit/:id" element={<EditInstance />} />
               </Route>
             </Routes>
           </div>

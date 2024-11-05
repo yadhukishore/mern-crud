@@ -5,10 +5,10 @@ const instanceSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
-    participantType:{
-        type:String,
-        require:true
-    },
+    participantType: [{
+        type: String,
+        required: true
+    }],
     ticket:{
         type:Number,
         require:true

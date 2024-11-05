@@ -36,6 +36,32 @@ const Home = () => {
     };
   }, []);
 
+  const formatParticipantTypes = (participantTypes) => {
+    if (!participantTypes) return '';
+    
+    // Handle if participantTypes is a string (comma-separated)
+    const typesArray = Array.isArray(participantTypes) 
+      ? participantTypes 
+      : participantTypes.split(',').map(type => type.trim());
+    
+    if (typesArray.length <= 2) {
+      return typesArray.join(', ');
+    }
+    
+    return `${typesArray[0]}, ${typesArray[1]} +${typesArray.length - 2} more`;
+  };
+
+  const formatTickets = (ticketCount) => {
+    if (!ticketCount || ticketCount <= 0) return 'No tickets';
+    
+    if (ticketCount <= 2) {
+      return Array.from({ length: ticketCount }, (_, i) => `Ticket ${String(i + 1).padStart(2, '0')}`).join(', ');
+    }
+    
+    return `Ticket 01, Ticket 02 +${ticketCount - 2} more`;
+  };
+
+
   const handleAddInstance = () => {
     Swal.fire({
       title: 'Add New Instance',
@@ -90,8 +116,8 @@ const Home = () => {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     
     setDropdownPosition({
-      top: rect.top + scrollTop - 10, // Position slightly above the button
-      left: rect.left - 120 // Offset to the left
+      top: rect.top + scrollTop - 10,
+      left: rect.left - 120
     });
     
     setOpenDropdownId(openDropdownId === id ? null : id);
@@ -114,7 +140,7 @@ const Home = () => {
               strokeWidth="1.5"
             >
               <path
-                d="M19 11H5M19 11C20.1046 11 21 11.8954 21 13V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V13C3 11.8954 3.89543 11 5 11M19 11V9C19 7.89543 18.1046 7 17 7M5 11V9C5 7.89543 5.89543 7 7 7M7 7V5C7 3.89543 7.89543 3 9 3H15C16.1046 3 17 3.89543 17 5V7M7 7H17"
+                d="M19 11H5M19 11C20.1046 11 21 21.8954 21 13V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V13C3 11.8954 3.89543 11 5 11M19 11V9C19 7.89543 18.1046 7 17 7M5 11V9C5 7.89543 5.89543 7 7 7M7 7V5C7 3.89543 7.89543 3 9 3H15C16.1046 3 17 3.89543 17 5V7M7 7H17"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
@@ -173,9 +199,12 @@ const Home = () => {
               return (
                 <tr key={instance._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 border-b border-gray-200">{instance.instanceName}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-gray-500">{instance.participantType},Volunteers, Guests, +2 more</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-gray-500">Ticket 01, Ticket 02 +2 more</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-blue-600 cursor-pointer">{alloted}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-gray-500">
+                    {formatParticipantTypes(instance.participantType)}
+                  </td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-gray-500">
+                    {formatTickets(instance.ticket)}
+                  </td>                  <td className="px-6 py-4 border-b border-gray-200 text-blue-600 cursor-pointer">{alloted}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-blue-600 cursor-pointer">{checkin}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-blue-600 cursor-pointer">{pending}</td>
                   <td className="px-6 py-4 border-b border-gray-200">
@@ -200,7 +229,6 @@ const Home = () => {
           </tbody>
         </table>
         
-        {/* Floating dropdown menu */}
         {openDropdownId && (
           <div 
             className="fixed bg-white rounded-md shadow-lg z-50 py-1 border border-gray-200"
